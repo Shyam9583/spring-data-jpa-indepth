@@ -1,0 +1,26 @@
+version: "3"
+services:
+  data-jpa-app:
+    build: .
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-db
+    environment:
+      SCHOOLAPP_USERNAME: schoolapp
+      SCHOOLAPP_PASSWORD: password
+  mysql-db:
+    image: "mysql:8.0.27"
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: schooldb
+      MYSQL_USER: schoolapp
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mysql-data-volume:/var/lib/mysql
+volumes:
+  mysql-data-volume:
