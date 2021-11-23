@@ -1,0 +1,31 @@
+version: "3"
+services:
+  app:
+    image: maven:3.8.3-openjdk-11-slim
+    restart: always
+    ports:
+      - "8081:8081"
+    command: mvn spring-boot:run
+    volumes:
+      - .:/usr/src/app:rw
+      - ${HOME}/.m2:/root/.m2
+    depends_on:
+      - mysql-db
+    working_dir: /usr/src/app
+    environment:
+      SCHOOLAPP_USERNAME: schoolapp
+      SCHOOLAPP_PASSWORD: password
+  mysql-db:
+    image: "mysql:8.0.27"
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: schooldb
+      MYSQL_USER: schoolapp
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mysql-data-volume:/var/lib/mysql
+volumes:
+  mysql-data-volume:
