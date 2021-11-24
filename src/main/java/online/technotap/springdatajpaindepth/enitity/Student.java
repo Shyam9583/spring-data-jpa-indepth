@@ -5,6 +5,8 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Table(
@@ -48,6 +50,16 @@ public class Student implements Serializable {
 
     @Embedded
     private Guardian guardian;
+
+    @ManyToMany
+    @ToString.Exclude
+    private List<Course> courses;
+
+    public void addCourse(Course course) {
+        if (courses == null) courses = new ArrayList<>();
+        course.addStudent(this);
+        courses.add(course);
+    }
 
     @Override
     public boolean equals(Object o) {

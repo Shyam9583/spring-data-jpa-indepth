@@ -5,6 +5,8 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Table(name = "course")
@@ -47,6 +49,27 @@ public class Course implements Serializable {
             referencedColumnName = "teacher_id"
     )
     private Teacher teacher;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "student_course_mapping",
+            joinColumns = @JoinColumn(
+                    name = "course_id",
+                    referencedColumnName = "course_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "student_id",
+                    referencedColumnName = "student_id"
+            )
+    )
+    @ToString.Exclude
+    private List<Student> students;
+
+    public void addStudent(Student student) {
+        if (students == null) students = new ArrayList<>();
+        student.addCourse(this);
+        students.add(student);
+    }
 
     @Override
     public boolean equals(Object o) {

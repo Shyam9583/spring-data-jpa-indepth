@@ -11,8 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -68,5 +73,25 @@ class CourseRepositoryTest extends BaseTest {
 
         Teacher resultTeacher = resultCourse.getTeacher();
         assertThat(resultTeacher.getCourses()).contains(course);
+    }
+
+    @Test
+    @DisplayName("This should return pageable list of courses")
+    public void test3() {
+        Random random = new Random();
+        IntStream.range(0, 10).forEach(i -> entityManager.persist(
+                Course.builder()
+                        .courseTitle(UUID.randomUUID().toString())
+                        .credit(random.nextInt(9))
+                        .build()));
+
+        Pageable firstPageWithThreeRecords = PageRequest.of(0, 3);
+        Pageable secondPageWithTwoRecords = PageRequest.of(1, 2);
+
+        List<Course> threePerPageCourses = courseRepository.findAll(firstPageWithThreeRecords).getContent();
+        assertThat(threePerPageCourses).hasSize(3);
+
+        List<Course> twoPerPageCourses = courseRepository.findAll(secondPageWithTwoRecords).getContent();
+        assertThat(twoPerPageCourses).hasSize(2);
     }
 }
